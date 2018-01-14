@@ -1,0 +1,3 @@
+---
+- name: Install Docker container engine
+  package: name=docker state=installed

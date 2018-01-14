@@ -1,0 +1,35 @@
+---
+- name: install cockpit and cockpit-kubernetes
+  yum:
+   name: "{{ item }}"
+   state: latest
+  with_items:
+        - cockpit
+        - cockpit-kubernetes
+
+- name: Enable the service
+  shell: systemctl enable --now cockpit.socket
+
+- name: Enable password authentication
+  lineinfile:
+     path: /etc/ssh/sshd_config
+     regexp: '^#PasswordAuthentication yes'
+     line: 'PasswordAuthentication yes'
+
+- name: Enable password authentication
+  lineinfile:
+     path: /etc/ssh/sshd_config
+     regexp: '^PasswordAuthentication no'
+     line: '#PasswordAuthentication no'
+
+- name: set password hash
+  set_fact:
+       hash_password: "{{ centos_password | password_hash('sha512') }}"
+  delegate_to: localhost
+  connection: local
+ 
+- name: Set password for centos user
+  user:
+   name: centos
+   password: "{{ hash_password }}"
+

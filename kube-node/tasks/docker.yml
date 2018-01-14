@@ -1,0 +1,21 @@
+---
+- name: Install docker
+  apt:
+   name: docker.io
+   update_cache: yes
+   state: latest
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install docker
+  yum:
+   name: docker
+   state: latest
+   update_cache: yes
+  when: ansible_distribution == 'CentOS'
+   
+- name: Enable docker
+  service:
+     name: docker
+     state: started
+     enabled: yes
+  when: ansible_distribution == 'CentOS'

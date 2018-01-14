@@ -1,0 +1,53 @@
+---
+- name: setup the repository
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+  when: ansible_distribution == 'CentOS'
+
+- name: Install the kubernet packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+    enablerepo: kubernetes
+    update_cache: yes
+  with_items:
+      - kubelet 
+      - kubeadm 
+      - kubectl
+  when: ansible_distribution == 'CentOS'
+
+- name: enable services
+  service:
+     name: kubelet
+     state: started
+     enabled: yes
+  when: ansible_distribution == 'CentOS'
+
+- name: setup on Ubuntu
+  apt:
+   name: apt-transport-https
+   state: latest
+   update_cache: yes
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Execute curl
+  shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+  when: ansible_distribution == 'Ubuntu'
+
+- name: copy the debian list
+  copy:
+   content: "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+   dest: /etc/apt/sources.list.d/kubernetes.list
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Insntall pkgs
+  apt:
+   name: "{{ item }}"
+   update_cache: yes
+   state: latest
+  with_items:
+        - kubelet
+        - kubeadm
+        - kubectl
+  when: ansible_distribution == 'Ubuntu'

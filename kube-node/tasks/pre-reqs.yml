@@ -1,0 +1,9 @@
+---
+- name: Disable SELINUX
+  shell: setenforce 0
+  ignore_errors: true
+ 
+- name: Disable firewall
+  shell: systemctl disable firewalld
+  ignore_errors: true
+
